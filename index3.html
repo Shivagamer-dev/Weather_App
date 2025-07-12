@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather Data</title>
+    <style>
+        body {
+            background: #373B44;
+            background: -webkit-linear-gradient(to right, #4286f4, #373B44);
+            background: linear-gradient(to right, #4286f4, #373B44);
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .body {
+            display: flex;
+            margin-top: 10%;
+
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: linear-gradient(to right, #057ed5, #0ebad8a3);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 8px rgba(255, 255, 255, 0.15);
+            margin-top: 5px;
+            
+        }
+
+        .card h3 {
+            margin-top: 0;
+            color: #ffffff;
+            font-weight: 900;
+            border-bottom: 2px solid white;
+            padding: 8px;
+        }
+
+        .card p {
+            margin: 8px 0;
+            color: #ffffff;
+        }
+
+        #inputSection {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input,
+        button {
+            border: 2px solid   #12d7faa3;
+            background-color: #c7e6ff;
+            outline: none;
+            padding: 8px 12px;
+            font-size: 12px;
+            margin-right: 7px;
+            margin-left: 9px;
+        }
+        button{
+            cursor: pointer;
+        }
+
+        img {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="body">
+        <div id="container">
+            <div id="inputSection">
+                <input type="text" id="cityInput" placeholder="Enter city name" />
+                <button onclick="weatherdata()">Get Weather</button>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script>
+        let parent = document.getElementById("container");
+
+        async function weatherdata() {
+            let key = "4596b98ab3c07348eef6ac4ff3735515";
+            let city = document.getElementById("cityInput").value || "Mumbai";
+
+            try {
+                let response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${key}`);
+                if (!response.ok) {
+                    throw new Error("City not found");
+                }
+
+                let data = await response.json();
+                console.log(data);
+
+                // Clear previous card if exists
+                let oldCard = document.querySelector(".card");
+                if (oldCard) oldCard.remove();
+
+                let user_card = document.createElement("div");
+                user_card.className = "card";
+
+                let city_name = document.createElement("h3");
+                city_name.textContent = `City: ${data.name}`;
+                user_card.appendChild(city_name);
+
+
+                let tempC = Math.round((data.main.temp - 273.15));
+                let temp = document.createElement("p");
+                temp.textContent = `Temperature: ${tempC} °C`;
+                user_card.appendChild(temp);
+
+                data.weather.forEach((w) => {
+                    let weather = document.createElement("p");
+                    weather.textContent = `Condition: ${w.main} - ${w.description}`;
+                    user_card.appendChild(weather);
+
+                    let icon = document.createElement("img");
+                    icon.src = `https://openweathermap.org/img/wn/${w.icon}@2x.png`;
+                    icon.alt = w.description;
+                    user_card.appendChild(icon);
+                });
+
+                let humidity = document.createElement("p");
+                humidity.textContent = `Humidity: ${data.main.humidity}%`;
+                user_card.appendChild(humidity);
+
+                parent.appendChild(user_card);
+            } catch (e) {
+                alert(e.message);
+                console.log(e);
+            }
+        }
+
+
+        weatherdata();
+    </script>
+</body>
+
+</html>
